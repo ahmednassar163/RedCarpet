@@ -1,3 +1,6 @@
+//This code was written by the servant of God,
+//and no one except him could understand/read how it was done.
+
 package com.nassar.man.android.redcarpet;
 
 import android.content.Context;
@@ -8,57 +11,103 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nassar.man.android.redcarpet.extras.Movie;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
 /**
  * Created by Andy on 12/2/2015.
  */
 public class CustomGridAdapter extends BaseAdapter {
 
     private Context mContext;
-    private final String[] label;
-    private final int[] imgId;
+    private final LayoutInflater mInflater;
 
-    public CustomGridAdapter(Context context, String[] label, int[] imgId) {
+    private final Movie mLock = new Movie();
+
+    private List<Movie> mObjects;
+
+
+    public CustomGridAdapter(Context context, List<Movie> objects) {
         mContext = context;
-        this.imgId = imgId;
-        this.label = label;
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mObjects = objects;
+    }
+
+    public Context getContext() {
+        return mContext;
+    }
+
+    public void add(Movie object) {
+        synchronized (mLock) {
+            mObjects.add(object);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        synchronized (mLock) {
+            mObjects.clear();
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setData(List<Movie> data) {
+        clear();
+        for (Movie movie : data) {
+            add(movie);
+        }
     }
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
-        return imgId.length;
+        return mObjects.size();
     }
 
     @Override
-    public Object getItem(int position) {
-        // TODO Auto-generated method stub
-        return null;
+    public Movie getItem(int position) {
+        return mObjects.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
-        return 0;
+        return position;
     }
-
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
+        View view = convertView;
+        ViewHolder viewHolder;
 
-        View grid;
-        LayoutInflater inflater = (LayoutInflater) mContext
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null) {
-            grid = new View(mContext);
-            grid = inflater.inflate(R.layout.grid_item_movie_display, null);
-            TextView textView = (TextView) grid.findViewById(R.id.grid_movie_title);
-            ImageView imageView = (ImageView) grid.findViewById(R.id.grid_movie_image);
-            textView.setText(label[position]);
-            imageView.setImageResource(imgId[position]);
-        } else {
-            grid = (View) convertView;
+        if (view == null) {
+            view = mInflater.inflate(R.layout.grid_item_movie_display, parent, false);
+            viewHolder = new ViewHolder(view);
+            view.setTag(viewHolder);
         }
-        return grid;
+
+        final Movie movie = getItem(position);
+
+        String image_url = "http://image.tmdb.org/t/p/w185" + movie.getImage();
+
+        viewHolder = (ViewHolder) view.getTag();
+
+        Picasso.with(getContext())
+                .load(image_url)
+                .error(R.drawable.ic_no_poster_error)
+                .into(viewHolder.moviePoster);
+        viewHolder.movieTitle.setText(movie.getTitle());
+
+        return view;
+    }
+
+    public static class ViewHolder {
+        public final ImageView moviePoster;
+        public final TextView movieTitle;
+
+        public ViewHolder(View view) {
+            movieTitle = (TextView) view.findViewById(R.id.grid_movie_title);
+            moviePoster = (ImageView) view.findViewById(R.id.grid_movie_image);
+        }
     }
 }

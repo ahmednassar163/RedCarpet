@@ -10,7 +10,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:src="@mipmap/ic_launcher"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
@@ -18,11 +17,9 @@
             android:id="@+id/grid_movie_title"
             android:layout_width="fill_parent"
             android:layout_height="45dp"
-            android:layout_marginTop="175dp"
+            android:layout_below="@+id/grid_movie_image"
             android:background="#FFF"
             android:gravity="center"
-            android:textColor="#000"
-            android:textSize="12sp"
             android:textStyle="bold"/>
 
 </RelativeLayout>

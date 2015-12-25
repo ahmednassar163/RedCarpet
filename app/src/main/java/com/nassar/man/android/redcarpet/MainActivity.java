@@ -1,3 +1,6 @@
+//This code was written by the servant of God,
+//and no one except him could understand/read how it was done.
+
 package com.nassar.man.android.redcarpet;
 
 import android.os.Bundle;

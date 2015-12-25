@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Red Carpet</string>
+
+    <!--Main fragment menu items-->
+    <string name="action_sort_by">Sort by</string>
+    <string name="action_sort_by_popularity">Most Popular</string>
+    <string name="action_sort_by_rating">Highest Rated</string>
+    <string name="action_sort_by_favorite">Favorites</string>
+
+    <string name="THE_MOVIE_DB_API_KEY">3ba125dafbee8f2a5f4df5a932ce4d2d</string>
 </resources>
