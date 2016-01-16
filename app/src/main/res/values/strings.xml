@@ -7,7 +7,7 @@
     <string name="action_sort_by_rating">Highest Rated</string>
     <string name="action_sort_by_favorite">Favorites</string>
 
-    <string name="THE_MOVIE_DB_API_KEY"></string>
+    <string name="THE_MOVIE_DB_API_KEY">3ba125dafbee8f2a5f4df5a932ce4d2d</string>
     <string name="rating">Rating</string>
     <string name="release_date">Released</string>
     <string name="details">Details</string>
