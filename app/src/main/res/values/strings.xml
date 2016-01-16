@@ -8,4 +8,15 @@
     <string name="action_sort_by_favorite">Favorites</string>
 
     <string name="THE_MOVIE_DB_API_KEY"></string>
+    <string name="rating">Rating</string>
+    <string name="release_date">Released</string>
+    <string name="details">Details</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="content_authority">com.nassar.man.android.redcarpet</string>
+    <string name="removed_from_favorites">Removed from Favorites</string>
+    <string name="added_to_favorites">Added to Favorites</string>
+    <string name="action_share">Share</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
 </resources>

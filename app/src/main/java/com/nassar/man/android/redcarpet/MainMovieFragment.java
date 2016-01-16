@@ -20,9 +20,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.nassar.man.android.redcarpet.data.MyMovieContract;
+import com.nassar.man.android.redcarpet.data.MovieContract;
 import com.nassar.man.android.redcarpet.extras.ConnectionDetector;
 import com.nassar.man.android.redcarpet.extras.Movie;
 
@@ -41,15 +40,16 @@ import java.util.List;
 
 public class MainMovieFragment extends Fragment {
 
-    private View view;
+    private GridView mGridView;
+    private LinearLayout noConnection;
+
+    public Context context;
+
 
     private ConnectionDetector cd;
     private boolean isInternetPresent = false;
 
-    private GridView mGridView;
-    private LinearLayout noConnection;
-
-    private CustomGridAdapter gridAdapter;
+    private MovieGridAdapter mMovieGridAdapter;
 
     private static final String SORT_SETTING_KEY = "sort_setting";
     private static final String POPULARITY_DESC = "popularity.desc";
@@ -62,14 +62,14 @@ public class MainMovieFragment extends Fragment {
     private ArrayList<Movie> mMovies = null;
 
     private static final String[] MOVIE_COLUMNS = {
-            MyMovieContract.MovieEntry._ID,
-            MyMovieContract.MovieEntry.COLUMN_MOVIE_ID,
-            MyMovieContract.MovieEntry.COLUMN_TITLE,
-            MyMovieContract.MovieEntry.COLUMN_IMAGE,
-            MyMovieContract.MovieEntry.COLUMN_IMAGE2,
-            MyMovieContract.MovieEntry.COLUMN_OVERVIEW,
-            MyMovieContract.MovieEntry.COLUMN_RATING,
-            MyMovieContract.MovieEntry.COLUMN_DATE
+            MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_TITLE,
+            MovieContract.MovieEntry.COLUMN_IMAGE,
+            MovieContract.MovieEntry.COLUMN_IMAGE2,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_RATING,
+            MovieContract.MovieEntry.COLUMN_DATE
     };
 
     public static final int COL_ID = 0;
@@ -164,38 +164,42 @@ public class MainMovieFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         cd = new ConnectionDetector(getContext());
-        isInternetPresent=cd.isConnectingToInternet();
+        isInternetPresent = cd.isConnectingToInternet();
 
-
-        view = inflater.inflate(R.layout.fragment_movie_main, container, false);
-
-
-        mGridView = (GridView) view.findViewById(R.id.grid_movie_main);
+        View view = inflater.inflate(R.layout.fragment_movie_main, container, false);
         noConnection = (LinearLayout) view.findViewById(R.id.linearLayout_no_connection);
+        mGridView = (GridView) view.findViewById(R.id.grid_movie_main);
 
-        noConnection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(),"Starting wifi",Toast.LENGTH_SHORT).show();
-                WifiManager wifiManager = (WifiManager)getContext().getSystemService(Context.WIFI_SERVICE);
-                wifiManager.setWifiEnabled(true);
 
-                if(wifiManager.setWifiEnabled(true)){
-                noConnection.setVisibility(view.INVISIBLE);
-                mGridView.setVisibility(view.VISIBLE);
+        if (isInternetPresent) {
+            noConnection.setVisibility(View.INVISIBLE);
+            mGridView.setVisibility(View.VISIBLE);
+            isInternetPresent = false;
+        } else {
+            WifiManager wifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+            wifiManager.setWifiEnabled(true);
+            noConnection.setVisibility(View.VISIBLE);
+            mGridView.setVisibility(View.INVISIBLE);
+            noConnection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    noConnection.setVisibility(View.INVISIBLE);
+                    mGridView.setVisibility(View.VISIBLE);
+                    updateMovies(POPULARITY_DESC);
                 }
-            }
-        });
+            });
+            isInternetPresent = true;
+        }
 
-        gridAdapter = new CustomGridAdapter(getActivity(), new ArrayList<Movie>());
+        mMovieGridAdapter = new MovieGridAdapter(getActivity(), new ArrayList<Movie>());
 
-        mGridView.setAdapter(gridAdapter);
+        mGridView.setAdapter(mMovieGridAdapter);
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Movie movie = gridAdapter.getItem(position);
-                Toast.makeText(getContext(), movie.getTitle().toUpperCase() + " movie is clicked", Toast.LENGTH_SHORT).show();
+                Movie movie = mMovieGridAdapter.getItem(position);
+                ((Callback) getActivity()).onItemSelected(movie);
             }
         });
 
@@ -206,7 +210,7 @@ public class MainMovieFragment extends Fragment {
 
             if (savedInstanceState.containsKey(MOVIES_KEY)) {
                 mMovies = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
-                gridAdapter.setData(mMovies);
+                mMovieGridAdapter.setData(mMovies);
             } else {
                 updateMovies(mSortBy);
             }
@@ -214,15 +218,6 @@ public class MainMovieFragment extends Fragment {
             updateMovies(mSortBy);
         }
 
-        if (isInternetPresent) {
-            noConnection.setVisibility(view.INVISIBLE);
-            mGridView.setVisibility(view.VISIBLE);
-            isInternetPresent = true;
-        } else {
-            noConnection.setVisibility(view.VISIBLE);
-            mGridView.setVisibility(view.INVISIBLE);
-            isInternetPresent = false;
-        }
 
         return view;
     }
@@ -342,8 +337,8 @@ public class MainMovieFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Movie> movies) {
             if (movies != null) {
-                if (gridAdapter != null) {
-                    gridAdapter.setData(movies);
+                if (mMovieGridAdapter != null) {
+                    mMovieGridAdapter.setData(movies);
                 }
                 mMovies = new ArrayList<>();
                 mMovies.addAll(movies);
@@ -374,7 +369,7 @@ public class MainMovieFragment extends Fragment {
         @Override
         protected List<Movie> doInBackground(Void... params) {
             Cursor cursor = mContext.getContentResolver().query(
-                    MyMovieContract.MovieEntry.CONTENT_URI,
+                    MovieContract.MovieEntry.CONTENT_URI,
                     MOVIE_COLUMNS,
                     null,
                     null,
@@ -386,8 +381,8 @@ public class MainMovieFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Movie> movies) {
             if (movies != null) {
-                if (gridAdapter != null) {
-                    gridAdapter.setData(movies);
+                if (mMovieGridAdapter != null) {
+                    mMovieGridAdapter.setData(movies);
                 }
                 mMovies = new ArrayList<>();
                 mMovies.addAll(movies);

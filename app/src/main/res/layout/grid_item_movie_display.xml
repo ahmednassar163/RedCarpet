@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/grid_item_movie_imageview"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="@dimen/grid_item_movie_height"
+    android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/grid_movie_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+    <TextView
+        android:id="@+id/grid_movie_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center|start"
+        android:padding="5dp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/grid_movie_title"
-            android:layout_width="fill_parent"
-            android:layout_height="45dp"
-            android:layout_below="@+id/grid_movie_image"
-            android:background="#FFF"
-            android:gravity="center"
-            android:textStyle="bold"/>
+    <ImageView
+        android:id="@+id/grid_movie_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop" />
 
-</RelativeLayout>
+</FrameLayout>
